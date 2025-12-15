@@ -246,16 +246,78 @@ function renderCats(){
  catList.innerHTML=categories.map((c,i)=>`<div>${c} <button onclick="categories.splice(${i},1);set(ref(db,'categories'),categories)">X</button></div>`).join("");
 }
 
-window.generatePDF=()=>{
- const element=document.querySelector(".container");
- const opt={
-  margin:[10,10,10,10],
-  filename:"Beste-Distributor-Catalog.pdf",
-  image:{type:"jpeg",quality:0.98},
-  html2canvas:{scale:2,allowTaint:true,useCORS:false},
-  jsPDF:{orientation:"portrait",unit:"mm",format:"a4"}
- };
- html2pdf().set(opt).from(element).save();
+window.generatePDF=async()=>{
+ const {jsPDF}=window.jspdf;
+ const doc=new jsPDF();
+ const pageWidth=doc.internal.pageSize.getWidth();
+ const pageHeight=doc.internal.pageSize.getHeight();
+ 
+ // Title Page
+ doc.setFillColor(43,138,138);
+ doc.rect(0,0,pageWidth,pageHeight,"F");
+ doc.setTextColor(255,255,255);
+ doc.setFontSize(48);
+ doc.text("Beste Distributor",pageWidth/2,pageHeight/3,{align:"center",fontStyle:"bold"});
+ doc.setFontSize(16);
+ doc.text("Professional Product Catalog",pageWidth/2,pageHeight/3+20,{align:"center"});
+ doc.setFontSize(12);
+ doc.text(`Generated: ${new Date().toLocaleDateString()}`,pageWidth/2,pageHeight-40,{align:"center"});
+ doc.addPage();
+ 
+ // Products Page
+ doc.setTextColor(0,0,0);
+ doc.setFillColor(43,138,138);
+ doc.rect(0,0,pageWidth,15,"F");
+ doc.setTextColor(255,255,255);
+ doc.setFontSize(18);
+ doc.text("Product Catalog",10,10);
+ 
+ let yPos=25;
+ const lineHeight=60;
+ 
+ products.forEach((p,i)=>{
+  if(yPos+lineHeight>pageHeight-10){
+   doc.addPage();
+   doc.setFillColor(43,138,138);
+   doc.rect(0,0,pageWidth,15,"F");
+   doc.setTextColor(255,255,255);
+   doc.setFontSize(18);
+   doc.text("Product Catalog (continued)",10,10);
+   yPos=25;
+   doc.setTextColor(0,0,0);
+  }
+  
+  doc.setFontSize(12);
+  doc.setFont(undefined,"bold");
+  doc.text(`${i+1}. ${p.name}`,12,yPos);
+  
+  doc.setFont(undefined,"normal");
+  doc.setFontSize(10);
+  doc.setTextColor(100,100,100);
+  doc.text(`Category: ${p.category}`,14,yPos+6);
+  
+  doc.setTextColor(43,138,138);
+  doc.setFont(undefined,"bold");
+  doc.text(`$${p.price}`,14,yPos+12);
+  
+  if(p.prevPrice){
+   doc.setTextColor(150,150,150);
+   doc.setFont(undefined,"normal");
+   doc.setFontSize(9);
+   doc.text(`Was: $${p.prevPrice}`,40,yPos+12);
+  }
+  
+  doc.setTextColor(0,0,0);
+  doc.setFont(undefined,"normal");
+  doc.setFontSize(9);
+  const desc=p.description||"No description";
+  const wrapped=doc.splitTextToSize(desc,60);
+  doc.text(wrapped,14,yPos+18);
+  
+  yPos+=lineHeight;
+ });
+ 
+ doc.save("Beste-Distributor-Catalog.pdf");
 };
 </script>
 
