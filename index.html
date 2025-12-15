@@ -3,75 +3,127 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Beste Distributor - Product Catalog</title>
+<title>Beste Distributor – Product Catalog</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,Helvetica,sans-serif;background:#f5f5f5;color:#333}
-.header{background:linear-gradient(135deg,#2b8a8a,#1e6b6b);color:#fff;text-align:center;padding:25px}
-.container{max-width:1200px;margin:20px auto;padding:0 20px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto;background:#f5f5f5;color:#333}
+header{background:linear-gradient(135deg,#2b8a8a,#1e6b6b);color:#fff;padding:24px;text-align:center}
+header h1{font-size:28px}
+header p{opacity:.9;margin-top:6px}
+.container{max-width:1200px;margin:24px auto;padding:0 16px}
+
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:20px}
-.btn{padding:10px 18px;border:none;border-radius:6px;font-weight:600;cursor:pointer}
-.btn-primary{background:#2b8a8a;color:#fff}
-.btn-secondary{background:#fff;border:2px solid #2b8a8a;color:#2b8a8a}
-.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+button{cursor:pointer;border:none;border-radius:6px;padding:10px 16px;font-weight:600}
+.primary{background:#2b8a8a;color:#fff}
+.secondary{background:#fff;border:2px solid #2b8a8a;color:#2b8a8a}
+.danger{background:#dc3545;color:#fff}
 
-.product-card{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1);position:relative}
-.sale-badge{position:absolute;top:10px;left:10px;background:#dc3545;color:#fff;padding:5px 8px;font-size:12px;border-radius:4px;font-weight:bold}
-.product-image{height:180px;background:#eee}
-.product-image img{width:100%;height:100%;object-fit:cover}
-.product-info{padding:15px}
-.product-price{font-size:20px;font-weight:bold;color:#2b8a8a}
-.old-price{text-decoration:line-through;color:#999;font-size:14px}
-.cart-btn{margin-top:10px;background:#ffc107;color:#333;padding:8px;border-radius:6px;font-weight:bold;width:100%;border:none;cursor:pointer}
-.whatsapp-btn{display:block;margin-top:8px;background:#25D366;color:#fff;padding:10px;border-radius:6px;text-align:center;font-weight:bold;text-decoration:none}
+.filters{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+input,select,textarea{padding:10px;border-radius:6px;border:1px solid #ccc;width:100%}
 
-.cart-fab{
- position:fixed;bottom:20px;right:20px;
- background:#25D366;color:#fff;
- padding:14px 18px;border-radius:50%;
- font-size:18px;font-weight:bold;
- cursor:pointer;z-index:999;
- box-shadow:0 4px 12px rgba(0,0,0,.3)
-}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+.card{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.card img{width:100%;height:180px;object-fit:cover;background:#eee}
+.card .info{padding:14px}
+.card h3{color:#2b8a8a;margin-bottom:6px}
+.price{font-size:20px;font-weight:700;color:#2b8a8a}
+.old{color:#999;text-decoration:line-through;font-size:14px}
+.badge{background:#28a745;color:#fff;font-size:11px;padding:3px 6px;border-radius:4px;margin-left:6px}
+.actions{display:flex;gap:6px;margin-top:10px}
+.actions button{flex:1;font-size:12px}
 
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:center;justify-content:center;z-index:1000}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center}
 .modal.active{display:flex}
-.modal-content{background:#fff;padding:20px;border-radius:8px;width:95%;max-width:420px;max-height:90vh;overflow:auto}
+.modal-box{background:#fff;padding:20px;border-radius:8px;width:90%;max-width:480px;max-height:90vh;overflow:auto}
+.modal-box h2{margin-bottom:14px;color:#2b8a8a}
+.form-group{margin-bottom:12px}
 
-.cart-item{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.cart-item input{width:50px}
-
+@media(max-width:600px){
+ header h1{font-size:22px}
+}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-<h1>Beste Distributor</h1>
-<p>Shop smarter, Save more, Delivered fast</p>
-</div>
+<header>
+  <h1>Beste Distributor</h1>
+  <p>Shop smarter • Save more • Delivered fast</p>
+</header>
 
 <div class="container">
-<div class="products-grid" id="productsGrid"></div>
+
+<div class="toolbar">
+  <button class="primary" onclick="openModal()">+ Add Product</button>
+  <button class="secondary" onclick="openCategories()">Manage Categories</button>
+  <button class="secondary" onclick="exportCatalog()">Export Professional Catalog</button>
 </div>
 
-<div class="cart-fab" onclick="openCart()">🛒 <span id="cartCount">0</span></div>
+<div class="filters">
+  <input id="search" placeholder="Search products..." oninput="render()">
+  <select id="categoryFilter" onchange="render()">
+    <option value="">All Categories</option>
+  </select>
+</div>
 
-<!-- CART MODAL -->
-<div class="modal" id="cartModal">
-<div class="modal-content">
-<h3>Your Order</h3>
-<div id="cartItems"></div>
-<p><strong>Total: $<span id="cartTotal">0.00</span></strong></p>
-<button class="btn btn-primary" onclick="checkout()">Send Order on WhatsApp</button>
-<button class="btn" onclick="closeCart()">Close</button>
+<div class="grid" id="grid"></div>
+
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal" id="productModal">
+<div class="modal-box">
+<h2 id="modalTitle">Add Product</h2>
+
+<div class="form-group">
+<input id="name" placeholder="Product name">
+</div>
+
+<div class="form-group">
+<select id="category"></select>
+</div>
+
+<div class="form-group">
+<input id="price" type="number" placeholder="Price">
+</div>
+
+<div class="form-group">
+<input id="prevPrice" type="number" placeholder="Previous price (optional)">
+</div>
+
+<div class="form-group">
+<textarea id="desc" placeholder="Description"></textarea>
+</div>
+
+<div class="form-group">
+<input type="file" id="image">
+</div>
+
+<div class="actions">
+<button class="primary" onclick="save()">Save</button>
+<button onclick="closeModal()">Cancel</button>
+</div>
+</div>
+</div>
+
+<!-- CATEGORY MODAL -->
+<div class="modal" id="catModal">
+<div class="modal-box">
+<h2>Categories</h2>
+<div id="catList"></div>
+<input id="newCat" placeholder="New category">
+<div class="actions">
+<button class="primary" onclick="addCategory()">Add</button>
+<button onclick="closeCategories()">Done</button>
+</div>
 </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
 
 const firebaseConfig = {
  apiKey: "AIzaSyBK9-eeQ0E7ovI88jcmk9aa10GWpI9V30U",
@@ -85,72 +137,94 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const storage = getStorage(app);
 
-let products={}, cart={};
+let products=[], categories=[], editing=null;
 
-onValue(ref(db,"products"),snap=>{
- products={};
- snap.forEach(c=>products[c.key]=c.val());
+onValue(ref(db,"products"),s=>{
+ products=[];
+ s.forEach(c=>products.push({id:c.key,...c.val()}));
  render();
 });
 
-function render(){
- const g=productsGrid; g.innerHTML="";
- Object.entries(products).forEach(([id,p])=>{
-  const sale=p.prevPrice && p.prevPrice>p.price;
-  const percent=sale?Math.round((1-p.price/p.prevPrice)*100):0;
-  g.innerHTML+=`
-  <div class="product-card">
-   ${sale?`<div class="sale-badge">${percent}% OFF</div>`:''}
-   <div class="product-image">${p.image?`<img src="${p.image}">`:''}</div>
-   <div class="product-info">
-    <strong>${p.name}</strong>
-    ${sale?`<div class="old-price">$${p.prevPrice}</div>`:''}
-    <div class="product-price">$${p.price}</div>
-    <button class="cart-btn" onclick="addToCart('${id}')">➕ Add to Cart</button>
+onValue(ref(db,"categories"),s=>{
+ categories=s.exists()?s.val():["Beverages","Snacks","Grocery"];
+ set(ref(db,"categories"),categories);
+ updateCats();
+});
+
+window.render=()=>{
+ const grid=document.getElementById("grid");
+ const q=document.getElementById("search").value.toLowerCase();
+ const cat=document.getElementById("categoryFilter").value;
+ grid.innerHTML="";
+ products.filter(p=>
+  (!q||p.name.toLowerCase().includes(q)) &&
+  (!cat||p.category===cat)
+ ).forEach(p=>{
+  grid.innerHTML+=`
+  <div class="card">
+   <img src="${p.image||''}">
+   <div class="info">
+    <h3>${p.name}</h3>
+    ${p.prevPrice?`<div class="old">$${p.prevPrice}</div>`:""}
+    <div class="price">$${p.price} ${p.prevPrice?'<span class="badge">DISCOUNT</span>':''}</div>
+    <p>${p.description||""}</p>
+    <div class="actions">
+     <button onclick="edit('${p.id}')">Edit</button>
+     <button class="danger" onclick="del('${p.id}')">Delete</button>
+    </div>
    </div>
   </div>`;
  });
+};
+
+window.openModal=()=>{editing=null;document.getElementById("productModal").classList.add("active")}
+window.closeModal=()=>document.getElementById("productModal").classList.remove("active")
+
+window.save=async()=>{
+ const data={
+  name:name.value,
+  category:category.value,
+  price:+price.value,
+  prevPrice:prevPrice.value?+prevPrice.value:null,
+  description:desc.value,
+  image:""
+ };
+ if(image.files[0]){
+  const r=sRef(storage,"products/"+Date.now()+"_"+image.files[0].name);
+  await uploadBytes(r,image.files[0]);
+  data.image=await getDownloadURL(r);
+ }
+ set(ref(db,"products/"+(editing||Date.now())),data);
+ closeModal();
+};
+
+window.edit=id=>{
+ const p=products.find(x=>x.id===id);
+ editing=id;
+ name.value=p.name;category.value=p.category;
+ price.value=p.price;prevPrice.value=p.prevPrice||"";
+ desc.value=p.description||"";
+ openModal();
+};
+
+window.del=id=>confirm("Delete?")&&remove(ref(db,"products/"+id));
+
+window.openCategories=()=>{catModal.classList.add("active");renderCats()}
+window.closeCategories=()=>catModal.classList.remove("active")
+window.addCategory=()=>{categories.push(newCat.value);set(ref(db,"categories"),categories);newCat.value=""}
+
+function updateCats(){
+ category.innerHTML=categories.map(c=>`<option>${c}</option>`).join("");
+ categoryFilter.innerHTML='<option value="">All Categories</option>'+categories.map(c=>`<option>${c}</option>`).join("");
 }
 
-window.addToCart=id=>{
- cart[id]=(cart[id]||0)+1;
- updateCart();
-};
-
-function updateCart(){
- cartCount.textContent=Object.values(cart).reduce((a,b)=>a+b,0);
+function renderCats(){
+ catList.innerHTML=categories.map((c,i)=>`<div>${c} <button onclick="categories.splice(${i},1);set(ref(db,'categories'),categories)">X</button></div>`).join("");
 }
 
-window.openCart=()=>{
- cartModal.classList.add("active");
- const list=cartItems; list.innerHTML="";
- let total=0;
- Object.entries(cart).forEach(([id,q])=>{
-  const p=products[id];
-  const sub=p.price*q; total+=sub;
-  list.innerHTML+=`
-  <div class="cart-item">
-   <span>${p.name} ($${p.price})</span>
-   <input type="number" min="1" value="${q}" onchange="cart['${id}']=this.value;updateCart();openCart()">
-  </div>`;
- });
- cartTotal.textContent=total.toFixed(2);
-};
-
-window.closeCart=()=>cartModal.classList.remove("active");
-
-window.checkout=()=>{
- let msg="Hello, I would like to order:%0A";
- let total=0;
- Object.entries(cart).forEach(([id,q])=>{
-  const p=products[id];
-  total+=p.price*q;
-  msg+=`• ${p.name} x${q} — $${(p.price*q).toFixed(2)}%0A`;
- });
- msg+=`%0ATotal: $${total.toFixed(2)}`;
- window.open(`https://wa.me/14372600437?text=${msg}`,'_blank');
-};
+window.exportCatalog=()=>window.print();
 </script>
 
 </body>
