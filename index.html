@@ -39,8 +39,17 @@ input,select,textarea{padding:10px;border-radius:6px;border:1px solid #ccc;width
 .modal-box h2{margin-bottom:14px;color:#2b8a8a}
 .form-group{margin-bottom:12px}
 
+@media print{
+ body{background:#fff}
+ .toolbar,.filters{display:none}
+ .grid{grid-template-columns:repeat(2,1fr);gap:16px}
+ .card{break-inside:avoid;page-break-inside:avoid;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+ header{break-after:avoid;margin-bottom:24px}
+}
+
 @media(max-width:600px){
  header h1{font-size:22px}
+ .grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -57,7 +66,7 @@ input,select,textarea{padding:10px;border-radius:6px;border:1px solid #ccc;width
 <div class="toolbar">
   <button class="primary" onclick="openModal()">+ Add Product</button>
   <button class="secondary" onclick="openCategories()">Manage Categories</button>
-  <button class="secondary" onclick="exportCatalog()">Export Professional Catalog</button>
+  <button class="secondary" onclick="generatePDF()">Export Professional Catalog</button>
 </div>
 
 <div class="filters">
@@ -120,6 +129,7 @@ input,select,textarea{padding:10px;border-radius:6px;border:1px solid #ccc;width
 </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
@@ -224,7 +234,17 @@ function renderCats(){
  catList.innerHTML=categories.map((c,i)=>`<div>${c} <button onclick="categories.splice(${i},1);set(ref(db,'categories'),categories)">X</button></div>`).join("");
 }
 
-window.exportCatalog=()=>window.print();
+window.generatePDF=()=>{
+ const element=document.querySelector(".container");
+ const opt={
+  margin:[10,10,10,10],
+  filename:"Beste-Distributor-Catalog.pdf",
+  image:{type:"jpeg",quality:0.98},
+  html2canvas:{scale:2},
+  jsPDF:{orientation:"portrait",unit:"mm",format:"a4"}
+ };
+ html2pdf().set(opt).from(element).save();
+};
 </script>
 
 </body>
