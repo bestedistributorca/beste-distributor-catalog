@@ -3,35 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Beste Distributor Catalog</title>
+<title>Beste Distributor - Product Catalog</title>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;color:#333}
-.header{background:linear-gradient(135deg,#2b8a8a,#1e6b6b);color:#fff;text-align:center;padding:20px}
+body{font-family:Arial,Helvetica,sans-serif;background:#f5f5f5;color:#333}
+.header{background:linear-gradient(135deg,#2b8a8a,#1e6b6b);color:#fff;text-align:center;padding:25px}
 .container{max-width:1200px;margin:20px auto;padding:0 20px}
-.toolbar{display:flex;gap:10px;justify-content:center;margin-bottom:20px;flex-wrap:wrap}
-.btn{padding:10px 20px;border:none;border-radius:6px;font-weight:600;cursor:pointer}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:20px}
+.btn{padding:10px 18px;border:none;border-radius:6px;font-weight:600;cursor:pointer}
 .btn-primary{background:#2b8a8a;color:#fff}
-.btn-danger{background:#dc3545;color:#fff}
+.btn-secondary{background:#fff;border:2px solid #2b8a8a;color:#2b8a8a}
 .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
 .product-card{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)}
 .product-image{height:180px;background:#eee}
 .product-image img{width:100%;height:100%;object-fit:cover}
 .product-info{padding:15px}
-.product-name{font-weight:700;color:#2b8a8a}
-.product-price{font-size:20px;font-weight:bold;margin:8px 0}
+.product-price{font-size:20px;font-weight:bold;color:#2b8a8a}
 .old-price{text-decoration:line-through;color:#999}
 .badge{background:#28a745;color:#fff;font-size:11px;padding:3px 8px;border-radius:4px}
-.product-actions{display:flex;gap:8px;margin-top:10px}
-.whatsapp{background:#25D366;color:#fff;padding:8px;border-radius:5px;text-align:center;font-size:13px;font-weight:bold;text-decoration:none}
+.product-actions{display:flex;gap:6px;margin-top:10px}
+.product-actions button{flex:1}
+.whatsapp-btn{display:block;margin-top:10px;background:#25D366;color:#fff;padding:10px;border-radius:6px;text-align:center;font-weight:bold;text-decoration:none}
+
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:center;justify-content:center;z-index:1000}
 .modal.active{display:flex}
-.modal-content{background:#fff;padding:25px;border-radius:8px;width:90%;max-width:500px}
-.form-group{margin-bottom:15px}
-.form-group label{display:block;font-weight:600;margin-bottom:5px}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px;border-radius:6px;border:1px solid #ddd}
-.modal-actions{display:flex;gap:10px}
+.modal-content{background:#fff;padding:25px;border-radius:8px;width:95%;max-width:500px;max-height:90vh;overflow:auto}
+.form-group{margin-bottom:12px}
+.form-group label{font-weight:600;font-size:13px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #ccc}
 </style>
 </head>
 
@@ -39,137 +39,136 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <div class="header">
 <h1>Beste Distributor</h1>
-<p>Product Catalog</p>
+<p>Shop smarter, Save more, Delivered fast</p>
 </div>
 
 <div class="container">
-
 <div class="toolbar">
 <button class="btn btn-primary" onclick="openProduct()">+ Add Product</button>
-<button class="btn btn-primary" onclick="openCategory()">📂 Categories</button>
+<button class="btn btn-secondary" onclick="openCategories()">📂 Categories</button>
+<button class="btn btn-secondary" onclick="exportPDF()">📄 Professional Catalog</button>
 </div>
 
-<div class="products-grid" id="grid"></div>
+<div class="products-grid" id="productsGrid"></div>
 </div>
 
 <!-- PRODUCT MODAL -->
 <div class="modal" id="productModal">
 <div class="modal-content">
 <h3 id="modalTitle">Add Product</h3>
-<div class="form-group"><label>Name</label><input id="name"></div>
-<div class="form-group"><label>Category</label><select id="category"></select></div>
-<div class="form-group"><label>Price</label><input type="number" id="price"></div>
-<div class="form-group"><label>Previous Price</label><input type="number" id="prev"></div>
-<div class="modal-actions">
+
+<div class="form-group"><label>Name</label><input id="pName"></div>
+<div class="form-group"><label>Category</label><select id="pCategory"></select></div>
+<div class="form-group"><label>Price</label><input type="number" id="pPrice"></div>
+<div class="form-group"><label>Previous Price</label><input type="number" id="pPrev"></div>
+<div class="form-group"><label>Description</label><textarea id="pDesc"></textarea></div>
+<div class="form-group"><label>Image</label><input type="file" id="pImage"></div>
+
 <button class="btn btn-primary" onclick="saveProduct()">Save</button>
 <button class="btn" onclick="closeProduct()">Cancel</button>
 </div>
 </div>
-</div>
 
 <!-- CATEGORY MODAL -->
-<div class="modal" id="catModal">
+<div class="modal" id="categoryModal">
 <div class="modal-content">
 <h3>Categories</h3>
 <div id="catList"></div>
 <input id="newCat" placeholder="New category">
 <button class="btn btn-primary" onclick="addCategory()">Add</button>
-<button class="btn" onclick="closeCategory()">Done</button>
+<button class="btn" onclick="closeCategories()">Close</button>
 </div>
 </div>
 
 <script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import {getDatabase,ref,onValue,set,remove} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
 
-const firebaseConfig={
- apiKey:"AIzaSyBK9-eeQ0E7ovI88jcmk9aa10GWpI9V30U",
- authDomain:"beste-distributor.firebaseapp.com",
- databaseURL:"https://beste-distributor-default-rtdb.firebaseio.com",
- projectId:"beste-distributor",
- storageBucket:"beste-distributor.firebasestorage.app",
- messagingSenderId:"384320855826",
- appId:"1:384320855826:web:349cfb70dae242f0f19dcb"
+const firebaseConfig = {
+ apiKey: "AIzaSyBK9-eeQ0E7ovI88jcmk9aa10GWpI9V30U",
+ authDomain: "beste-distributor.firebaseapp.com",
+ databaseURL: "https://beste-distributor-default-rtdb.firebaseio.com",
+ projectId: "beste-distributor",
+ storageBucket: "beste-distributor.firebasestorage.app",
+ messagingSenderId: "384320855826",
+ appId: "1:384320855826:web:349cfb70dae242f0f19dcb"
 };
 
-const app=initializeApp(firebaseConfig);
-const db=getDatabase(app);
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const storage = getStorage(app);
 
-let editId=null;
-let categories=[];
+let products={}, categories=["Beverages","Snacks","Other"], editId=null;
 
-/* LOAD CATEGORIES */
-onValue(ref(db,'categories'),s=>{
- categories=s.exists()?Object.values(s.val()):["General"];
- renderCats();
-});
+onValue(ref(db,"products"),s=>{products={};s.forEach(c=>products[c.key]=c.val());render()});
+onValue(ref(db,"categories"),s=>{if(s.exists()) categories=s.val();renderCats()});
 
-/* LOAD PRODUCTS */
-onValue(ref(db,'products'),s=>{
- const g=document.getElementById('grid');
- g.innerHTML='';
- s.forEach(c=>{
-  const p=c.val();
-  const disc=p.prevPrice&&p.prevPrice>p.price;
-  const wa=`https://wa.me/14372600437?text=${encodeURIComponent(`Interested in ${p.name} - $${p.price}`)}`;
+function render(){
+ const g=productsGrid; g.innerHTML="";
+ Object.entries(products).forEach(([id,p])=>{
+  const disc=p.prevPrice && p.prevPrice>p.price;
+  const wa=`https://wa.me/14372600437?text=${encodeURIComponent(`Interested in ${p.name} ($${p.price})`)}`;
   g.innerHTML+=`
   <div class="product-card">
-   <div class="product-image"></div>
+   <div class="product-image">${p.image?`<img src="${p.image}">`:''}</div>
    <div class="product-info">
-    <div class="product-name">${p.name}</div>
+    <strong>${p.name}</strong>
     ${disc?`<div class="old-price">$${p.prevPrice}</div>`:''}
     <div class="product-price">$${p.price} ${disc?'<span class="badge">DISCOUNT</span>':''}</div>
-    <a class="whatsapp" href="${wa}" target="_blank">Order on WhatsApp</a>
+    <a class="whatsapp-btn" href="${wa}" target="_blank">📲 Order on WhatsApp</a>
     <div class="product-actions">
-     <button onclick="editProduct('${c.key}')">Edit</button>
-     <button onclick="delProduct('${c.key}')">Delete</button>
+     <button onclick="edit('${id}')">Edit</button>
+     <button onclick="del('${id}')">Delete</button>
     </div>
    </div>
   </div>`;
  });
-});
+}
 
-window.openProduct=()=>{editId=null;document.getElementById('productModal').classList.add('active')}
-window.closeProduct=()=>document.getElementById('productModal').classList.remove('active')
+window.openProduct=()=>{editId=null;productModal.classList.add("active")};
+window.closeProduct=()=>productModal.classList.remove("active");
 
-window.saveProduct=()=>{
+window.saveProduct=async()=>{
+ let img="";
+ if(pImage.files[0]){
+  const r=sRef(storage,"products/"+Date.now()+"_"+pImage.files[0].name);
+  await uploadBytes(r,pImage.files[0]);
+  img=await getDownloadURL(r);
+ }
  const p={
-  name:name.value,
-  category:category.value,
-  price:+price.value,
-  prevPrice:prev.value?+prev.value:null
+  name:pName.value,
+  category:pCategory.value,
+  price:+pPrice.value,
+  prevPrice:+pPrev.value||null,
+  description:pDesc.value,
+  image:img
  };
- set(ref(db,'products/'+(editId||Date.now())),p);
+ set(ref(db,"products/"+(editId||Date.now())),p);
  closeProduct();
 };
 
-window.editProduct=id=>{
- editId=id;
- onValue(ref(db,'products/'+id),s=>{
-  const p=s.val();
-  name.value=p.name;category.value=p.category;
-  price.value=p.price;prev.value=p.prevPrice||'';
- });
- openProduct();
+window.edit=id=>{
+ editId=id; const p=products[id];
+ pName.value=p.name; pCategory.value=p.category;
+ pPrice.value=p.price; pPrev.value=p.prevPrice||"";
+ pDesc.value=p.description||""; openProduct();
 };
 
-window.delProduct=id=>confirm('Delete?')&&remove(ref(db,'products/'+id));
-
-window.openCategory=()=>{catModal.classList.add('active');renderCats()}
-window.closeCategory=()=>catModal.classList.remove('active')
+window.del=id=>confirm("Delete?")&&remove(ref(db,"products/"+id));
 
 function renderCats(){
- category.innerHTML='';
- catList.innerHTML='';
- categories.forEach((c,i)=>{
-  category.innerHTML+=`<option>${c}</option>`;
-  catList.innerHTML+=`<div>${c} <button onclick="removeCat(${i})">x</button></div>`;
- });
- set(ref(db,'categories'),categories);
+ pCategory.innerHTML=categories.map(c=>`<option>${c}</option>`).join("");
+ catList.innerHTML=categories.map((c,i)=>`<div>${c} <button onclick="categories.splice(${i},1);saveCats()">x</button></div>`).join("");
+ set(ref(db,"categories"),categories);
 }
 
-window.addCategory=()=>{categories.push(newCat.value);newCat.value='';renderCats()}
-window.removeCat=i=>{categories.splice(i,1);renderCats()}
+window.openCategories=()=>categoryModal.classList.add("active");
+window.closeCategories=()=>categoryModal.classList.remove("active");
+window.addCategory=()=>{categories.push(newCat.value);newCat.value="";renderCats()};
+window.saveCats=()=>set(ref(db,"categories"),categories);
+
+window.exportPDF=()=>window.print();
 </script>
 
 </body>
