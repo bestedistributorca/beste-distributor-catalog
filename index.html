@@ -193,12 +193,23 @@ window.openModal=()=>{editing=null;document.getElementById("productModal").class
 window.closeModal=()=>document.getElementById("productModal").classList.remove("active")
 
 window.save=async()=>{
+ const nameVal=name.value.trim();
+ const categoryVal=category.value.trim();
+ const priceVal=price.value;
+ const prevPriceVal=prevPrice.value?+prevPrice.value:null;
+ const descVal=desc.value.trim();
+ 
+ if(!nameVal||!categoryVal||!priceVal){
+  alert("Please fill in name, category, and price");
+  return;
+ }
+ 
  const data={
-  name:name.value,
-  category:category.value,
-  price:+price.value,
-  prevPrice:prevPrice.value?+prevPrice.value:null,
-  description:desc.value,
+  name:nameVal,
+  category:categoryVal,
+  price:+priceVal,
+  prevPrice:prevPriceVal,
+  description:descVal,
   image:""
  };
  if(image.files[0]){
@@ -207,6 +218,7 @@ window.save=async()=>{
   data.image=await getDownloadURL(r);
  }
  set(ref(db,"products/"+(editing||Date.now())),data);
+ name.value="";category.value="";price.value="";prevPrice.value="";desc.value="";image.value="";
  closeModal();
 };
 
@@ -240,7 +252,7 @@ window.generatePDF=()=>{
   margin:[10,10,10,10],
   filename:"Beste-Distributor-Catalog.pdf",
   image:{type:"jpeg",quality:0.98},
-  html2canvas:{scale:2},
+  html2canvas:{scale:2,allowTaint:true,useCORS:false},
   jsPDF:{orientation:"portrait",unit:"mm",format:"a4"}
  };
  html2pdf().set(opt).from(element).save();
